@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liturgy TV</title>
+  <style>
+    /* A sample TV home screen. Use the arrow keys and Enter, like a remote. */
+    html { font-size: 16px; }
+    @media (min-width: 1600px) { html { font-size: 22px; } }
+    body { margin: 0; min-height: 100vh; overflow: hidden; color: #fff; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #101418 radial-gradient(ellipse at 30% 110%, #2a3340 0%, #101418 60%); }
+    header { position: relative; z-index: 1; display: flex; justify-content: flex-end; padding: 3.6rem 5rem 0; }
+    .when { text-align: right; max-width: 52vw; }
+    .clock { font-size: 5rem; font-weight: 300; line-height: 1; }
+    .date { font-size: 1.6rem; margin: .4rem 0 .3rem; color: rgba(255, 255, 255, .85); }
+    nav { position: fixed; left: 5rem; right: 5rem; bottom: 4rem; z-index: 1; display: flex; gap: 1.2rem; }
+    nav button { border: 0; border-radius: 1.4rem; padding: 1.4rem 2rem; font: 600 1.3rem inherit; font-family: inherit; color: #fff; background: rgba(255, 255, 255, .1); }
+    nav button:focus { outline: none; background: #fff; color: #111; transform: scale(1.06); }
+    .hint { position: fixed; left: 5rem; bottom: 1.4rem; font-size: 1rem; color: rgba(255, 255, 255, .5); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="when">
+      <div class="clock" id="clock"></div>
+      <div class="date" id="date"></div>
+      <div id="litcal"></div>
+    </div>
+  </header>
+  <nav>
+    <button id="reading">✝ Saint &amp; Gospel</button>
+    <button>Netflix</button>
+    <button>YouTube</button>
+  </nav>
+  <div class="hint" id="hint"></div>
+  <script src="liturgy-tv.js"></script>
+  <script>
+    function tick() {
+      var d = new Date();
+      document.getElementById('clock').textContent = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      document.getElementById('date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+    tick(); setInterval(tick, 10e3);
+
+    // ?api=https://your-worker.workers.dev to read the saint and Gospel from a liturgy-frame Worker.
+    var api = new URLSearchParams(location.search).get('api') || '';
+    LiturgyTV.start({ line: document.getElementById('litcal'), api: api });
+    document.getElementById('hint').textContent = api || window.LiturgyBridge ? '← → to move · Enter to open'
+      : 'Add ?api=<your liturgy-frame Worker> to this address for the saint and Gospel';
+
+    // Remote: Left and Right move between buttons, Enter opens.
+    var buttons = [].slice.call(document.querySelectorAll('nav button'));
+    buttons[0].focus();
+    document.getElementById('reading').addEventListener('click', function () { LiturgyTV.open(); });
+    window.addEventListener('keydown', function (e) {
+      var i = buttons.indexOf(document.activeElement);
+      if (e.keyCode === 39 || e.keyCode === 22) buttons[Math.min(buttons.length - 1, i + 1)].focus();
+      if (e.keyCode === 37 || e.keyCode === 21) buttons[Math.max(0, i - 1)].focus();
+    });
+    window.addEventListener('keyup', function () { if (!LiturgyTV.isOpen() && buttons.indexOf(document.activeElement) < 0) buttons[0].focus(); });
+  </script>
+</body>
+</html>
