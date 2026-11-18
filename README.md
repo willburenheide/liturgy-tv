@@ -80,4 +80,4 @@ stops showing, please [open an issue](https://github.com/willburenheide/liturgy-
 This first ran on the home screen of [couch-tv](https://github.com/Seagey/couch-tv) by Seagey. It's
 shared here on its own so anyone can put it on their TV.
 
-*Ad majorem Dei gloriam.* MIT licensed.
+*Ut in omnibus glorificetur Deus.* That in all things God may be glorified (Rule of St. Benedict 57). MIT licensed.
